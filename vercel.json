@@ -1,7 +1,14 @@
 {
-    "functions": {
-        "api/**/*.js": {
-            "runtime": "node@14"
+    "builds": [
+        {
+            "src": "./server.js",
+            "use": "@vercel/node"
         }
-    }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/"
+        }
+    ]
 }
