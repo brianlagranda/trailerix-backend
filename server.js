@@ -3,7 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
-const PORT = 8000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 const accessToken = process.env.TMDB_ACCESS_TOKEN;
