@@ -3,10 +3,9 @@ const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
-const PORT = process.env.PORT || 3000;
-const app = express();
-
 const accessToken = process.env.TMDB_ACCESS_TOKEN;
+
+const app = express();
 
 app.use(cors());
 
@@ -42,3 +41,5 @@ app.get('/data', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+module.exports = app;
