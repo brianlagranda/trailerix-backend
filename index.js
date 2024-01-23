@@ -4,6 +4,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const accessToken = process.env.TMDB_ACCESS_TOKEN;
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -41,5 +42,7 @@ app.get('/data', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+app.listen(PORT, () => console.log('Server is running'));
 
 module.exports = app;
