@@ -13,12 +13,7 @@ app.use(cors());
 
 async function getGenreNames(mediaType) {
     const response = await axios.get(
-        `https://api.themoviedb.org/3/genre/${mediaType}/list`,
-        {
-            params: {
-                api_key: apiKey,
-            },
-        }
+        `https://api.themoviedb.org/3/genre/${mediaType}/list?api_key=${apiKey}`
     );
 
     const genres = response.data.genres.reduce((acc, genre) => {
