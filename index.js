@@ -4,11 +4,30 @@ const axios = require('axios');
 require('dotenv').config();
 
 const accessToken = process.env.TMDB_ACCESS_TOKEN;
+const apiKey = process.env.TMDB_API_KEY;
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
 app.use(cors());
+
+async function getGenreNames(mediaType) {
+    const response = await axios.get(
+        `https://api.themoviedb.org/3/genre/${mediaType}/list`,
+        {
+            params: {
+                api_key: apiKey,
+            },
+        }
+    );
+
+    const genres = response.data.genres.reduce((acc, genre) => {
+        acc[genre.id] = genre.name;
+        return acc;
+    }, {});
+
+    return genres;
+}
 
 app.get('/', (req, res) => {
     res.json('Hello World!');
@@ -36,7 +55,24 @@ app.get('/data', async (req, res) => {
         };
 
         const response = await axios.request(options);
-        res.json(response.data);
+
+        const genreNamesMovies = await getGenreNames('movie');
+        const genreNamesTV = await getGenreNames('tv');
+
+        const enrichedData = response.data.results.map((result) => {
+            const genreNames =
+                result.media_type === 'movie' ? genreNamesMovies : genreNamesTV;
+            const genres = result.genre_ids.map(
+                (genreId) => genreNames[genreId]
+            );
+
+            return {
+                ...result,
+                genres,
+            };
+        });
+
+        res.json({ results: enrichedData });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -46,5 +82,7 @@ app.get('/data', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running`);
 });
+
+module.exports = app;
 
 module.exports = app;
