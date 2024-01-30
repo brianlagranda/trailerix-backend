@@ -59,6 +59,8 @@ app.get('/data', async (req, res) => {
         const genreNamesMovies = await getGenreNames('movie');
         const genreNamesTV = await getGenreNames('tv');
 
+        console.log(response.data.results);
+
         const enrichedData = response.data.results.map((result) => {
             const genreNames =
                 result.media_type === 'movie' ? genreNamesMovies : genreNamesTV;
@@ -74,7 +76,10 @@ app.get('/data', async (req, res) => {
 
         res.json({ results: enrichedData });
     } catch (error) {
-        console.error(error);
+        console.error(
+            'Error:',
+            error.response ? error.response.data : error.message
+        );
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
