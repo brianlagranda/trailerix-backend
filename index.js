@@ -54,14 +54,13 @@ app.get('/data', async (req, res) => {
         const genreNamesMovies = await getGenreNames('movie');
         const genreNamesTV = await getGenreNames('tv');
 
-        console.log(response.data.results);
-
         const enrichedData = response.data.results.map((result) => {
             const genreNames =
                 result.media_type === 'movie' ? genreNamesMovies : genreNamesTV;
-            const genres = result.genre_ids.map(
-                (genreId) => genreNames[genreId]
-            );
+            const genres =
+                result.genre_ids && result.genre_ids.length
+                    ? result.genre_ids.map((genreId) => genreNames[genreId])
+                    : [];
 
             return {
                 ...result,
