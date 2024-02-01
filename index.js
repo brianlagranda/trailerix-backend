@@ -79,8 +79,8 @@ app.get('/data', async (req, res) => {
         const genreNamesMovies = await getGenreNames('movie');
         const genreNamesTV = await getGenreNames('tv');
 
-        const trailerMovies = await getTrailer('movie');
-        const trailerTV = await getTrailer('tv');
+        const trailerMovies = (await getTrailer(result.id, 'movie')) || {};
+        const trailerTV = (await getTrailer(result.id, 'tv')) || {};
 
         const enrichedData = response.data.results.map((result) => {
             const genreNames =
