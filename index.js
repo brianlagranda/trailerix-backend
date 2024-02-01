@@ -24,8 +24,33 @@ async function getGenreNames(mediaType) {
     return genres;
 }
 
+async function getTrailer(id, mediaType) {
+    try {
+        const response = await axios.get(
+            `https://api.themoviedb.org/3/${mediaType}/${id}/videos?api_key=${apiKey}`
+        );
+
+        const trailerResults = response.data.results.filter(
+            (result) => result.type === 'Trailer'
+        );
+
+        if (trailerResults.length > 0) {
+            const lastTrailer = trailerResults[trailerResults.length - 1];
+
+            const { key, size } = lastTrailer;
+
+            return { key, size };
+        } else {
+            throw new Error('No trailers found');
+        }
+    } catch (error) {
+        console.error('Error fetching trailer:', error.message);
+        throw new Error('Failed to fetch trailer');
+    }
+}
+
 app.get('/', (req, res) => {
-    res.json('Hello World!');
+    res.json('Welcome to Trailerix backend! 🚀');
 });
 
 app.get('/data', async (req, res) => {
@@ -54,9 +79,14 @@ app.get('/data', async (req, res) => {
         const genreNamesMovies = await getGenreNames('movie');
         const genreNamesTV = await getGenreNames('tv');
 
+        const trailerMovies = await getTrailer('movie');
+        const trailerTV = await getTrailer('tv');
+
         const enrichedData = response.data.results.map((result) => {
             const genreNames =
                 result.media_type === 'movie' ? genreNamesMovies : genreNamesTV;
+            const trailer =
+                result.media_type === 'movie' ? trailerMovies : trailerTV;
             const genres =
                 result.genre_ids && result.genre_ids.length
                     ? result.genre_ids.map((genreId) => genreNames[genreId])
@@ -65,6 +95,7 @@ app.get('/data', async (req, res) => {
             return {
                 ...result,
                 genres,
+                trailer,
             };
         });
 
@@ -81,7 +112,5 @@ app.get('/data', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running`);
 });
-
-module.exports = app;
 
 module.exports = app;
