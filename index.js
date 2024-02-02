@@ -79,25 +79,35 @@ app.get('/data', async (req, res) => {
         const genreNamesMovies = await getGenreNames('movie');
         const genreNamesTV = await getGenreNames('tv');
 
-        const trailerMovies = (await getTrailer(result.id, 'movie')) || {};
-        const trailerTV = (await getTrailer(result.id, 'tv')) || {};
+        const enrichedData = await Promise.all(
+            response.data.results.map(async (result) => {
+                try {
+                    const genreNames =
+                        result.media_type === 'movie'
+                            ? genreNamesMovies
+                            : genreNamesTV;
+                    const trailer =
+                        result.media_type === 'movie'
+                            ? (await getTrailer(result.id, 'movie')) || {}
+                            : (await getTrailer(result.id, 'tv')) || {};
+                    const genres =
+                        result.genre_ids && result.genre_ids.length
+                            ? result.genre_ids.map(
+                                  (genreId) => genreNames[genreId]
+                              )
+                            : [];
 
-        const enrichedData = response.data.results.map((result) => {
-            const genreNames =
-                result.media_type === 'movie' ? genreNamesMovies : genreNamesTV;
-            const trailer =
-                result.media_type === 'movie' ? trailerMovies : trailerTV;
-            const genres =
-                result.genre_ids && result.genre_ids.length
-                    ? result.genre_ids.map((genreId) => genreNames[genreId])
-                    : [];
-
-            return {
-                ...result,
-                genres,
-                trailer,
-            };
-        });
+                    return {
+                        ...result,
+                        genres,
+                        trailer,
+                    };
+                } catch (error) {
+                    console.error('Error enriching data:', error.message);
+                    return result; // Return the original result if there's an error
+                }
+            })
+        );
 
         res.json({ results: enrichedData });
     } catch (error) {
