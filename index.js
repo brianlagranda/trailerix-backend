@@ -104,12 +104,19 @@ app.get('/data', async (req, res) => {
                     };
                 } catch (error) {
                     console.error('Error enriching data:', error.message);
+<<<<<<< HEAD
                     return result;
                 }
             })
         );
 
         console.log(enrichedData);
+=======
+                    return result; // Return the original result if there's an error
+                }
+            })
+        );
+>>>>>>> 13220b2e88b38532172d1a33f4b741f049166080
 
         res.json({ results: enrichedData });
     } catch (error) {
