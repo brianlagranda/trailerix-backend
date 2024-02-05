@@ -1,5 +1,4 @@
-const express = require('express');
-const cors = require('cors');
+const express = require('express');const cors = require('cors');
 const axios = require('axios');
 require('dotenv').config();
 
@@ -37,9 +36,9 @@ async function getTrailer(id, mediaType) {
         if (trailerResults.length > 0) {
             const lastTrailer = trailerResults[trailerResults.length - 1];
 
-            const { key, size } = lastTrailer;
+            const { key } = lastTrailer;
 
-            return { key, size };
+            return { key };
         } else {
             throw new Error('No trailers found');
         }
